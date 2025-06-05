@@ -1,0 +1,7 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'local>flowers-software/renovate-config',
+    'local>flowers-software/renovate-config:automerge',
+  ]
+}
