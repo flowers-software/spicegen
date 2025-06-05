@@ -1,8 +1,8 @@
-package com.oviva.spicegen.generator.internal;
+package com.flowers.spicegen.generator.internal;
 
-import com.oviva.spicegen.generator.Options;
-import com.oviva.spicegen.model.Schema;
-import com.oviva.spicegen.parser.SpiceDbSchemaParser;
+import com.flowers.spicegen.generator.Options;
+import com.flowers.spicegen.model.Schema;
+import com.flowers.spicegen.parser.SpiceDbSchemaParser;
 import java.nio.file.Path;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class SpiceDbClientGeneratorImplTest {
 
   private static final String sourceDirectory = "./out/src/main/java";
-  private static final String sourcePackageName = "com.oviva.spicegen";
+  private static final String sourcePackageName = "com.flowers.spicegen";
 
   @ParameterizedTest
   @ValueSource(strings = {"files"})

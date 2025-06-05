@@ -1,0 +1,57 @@
+name: run unit tests
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    paths-ignore:
+      - '.github/**'
+permissions:
+  contents: read # This is required for actions/checkout
+  checks: write # This is required for creating the junit report
+  pull-requests: write # This is required for creating the coverage report
+jobs:
+  test:
+    concurrency:
+      group: pr-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Build and test
+        run: mvn -B org.jacoco:jacoco-maven-plugin:prepare-agent verify org.jacoco:jacoco-maven-plugin:report
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure()   # always run even if the previous step fails
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
+        with:
+          report_paths: '**/target/surefire-reports/TEST-*.xml'
+          exclude_sources: /target/
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: |
+            ${{ github.workspace }}/**/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
+          title: Coverage Report
+          update-comment: true
+
+        # Publish Coverage Job Summary
+      - name: Add Jacocoo report to workflow run summary
+        run: |
+          echo "| <!-- -->    | <!-- -->    |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Project Code Coverage % | ${{ steps.jacoco.outputs.coverage-overall }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| PR Code Coverage % | ${{ steps.jacoco.outputs.coverage-changed-files }} |" >> $GITHUB_STEP_SUMMARY  
+

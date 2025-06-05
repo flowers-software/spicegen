@@ -1,4 +1,4 @@
-module github.com/oviva-ag/spicegen/parser
+module github.com/flowers-software/spicegen/parser
 
 go 1.22.2
 toolchain go1.23.6
