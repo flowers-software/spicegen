@@ -199,3 +199,8 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+=================================================================
+Changes to this distribution:
+- Copyright (c) 2025 Flowers Software GmbH
+- Forked from Version v0.14.0
+- Modified under the terms of the Apache 2.0 License

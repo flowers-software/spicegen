@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.oviva.spicegen</groupId>
+  <groupId>com.flowers.spicegen</groupId>
   <artifactId>spicegen-parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
@@ -10,7 +10,7 @@
 
   <name>spicegen</name>
   <description>code generation for typesafe SpiceDB clients</description>
-  <url>https://github.com/oviva-ag/spicegen</url>
+  <url>https://github.com/flowers-software/spicegen</url>
   <licenses>
     <license>
       <name>Apache-2.0</name>
@@ -19,13 +19,6 @@
       <comments>A business-friendly OSS license</comments>
     </license>
   </licenses>
-  <developers>
-    <developer>
-      <id>trichner</id>
-      <name>Thomas Richner</name>
-      <url>https://github.com/thomasrichner-oviva</url>
-    </developer>
-  </developers>
 
   <contributors>
     <contributor>
@@ -33,6 +26,9 @@
     </contributor>
     <contributor>
       <name>Thomas Richner</name>
+    </contributor>
+    <contributor>
+      <name>Benedikt Schneppe</name>
     </contributor>
   </contributors>
 
@@ -46,17 +42,9 @@
   </modules>
 
   <scm>
-    <connection>scm:git:https://github.com/oviva-ag/spicegen.git</connection>
-    <url>https://github.com/oviva-ag/spicegen</url>
+    <connection>scm:git:https://github.com/flowers-software/spicegen.git</connection>
+    <url>https://github.com/flowers-software/spicegen</url>
   </scm>
-
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <name>GitHub Oviva Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/oviva-ag/spicegen</url>
-    </repository>
-  </distributionManagement>
 
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
@@ -102,13 +90,6 @@
     <spotless.maven.plugin.version>2.44.3</spotless.maven.plugin.version>
     <jacoco.version>0.8.12</jacoco.version>
 
-    <sonar.organization>oviva-ag</sonar.organization>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.projectName>spicegen</sonar.projectName>
-    <sonar.projectKey>oviva-ag_spicegen</sonar.projectKey>
-    <sonar.moduleKey>${project.groupId}_${project.artifactId}</sonar.moduleKey>
-    <sonar.cpd.exclusions>**/com/oviva/spicegen/api/**</sonar.cpd.exclusions>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco-ut/jacoco.xml,${project.build.directory}/site/jacoco-it/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
   </properties>
 
   <dependencyManagement>
@@ -140,22 +121,22 @@
       </dependency>
 
       <dependency>
-        <groupId>com.oviva.spicegen</groupId>
+        <groupId>com.flowers.spicegen</groupId>
         <artifactId>generator</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.oviva.spicegen</groupId>
+        <groupId>com.flowers.spicegen</groupId>
         <artifactId>api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.oviva.spicegen</groupId>
+        <groupId>com.flowers.spicegen</groupId>
         <artifactId>model</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.oviva.spicegen</groupId>
+        <groupId>com.flowers.spicegen</groupId>
         <artifactId>spicedb-binding</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -252,6 +233,17 @@
               </configuration>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.openrewrite.maven</groupId>
+          <artifactId>rewrite-maven-plugin</artifactId>
+          <version>6.10.0</version>
+          <configuration>
+            <exportDatatables>true</exportDatatables>
+            <activeRecipes>
+              <recipe>com.flowers.ChangePackage</recipe>
+            </activeRecipes>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>

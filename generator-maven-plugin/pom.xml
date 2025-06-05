@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.oviva.spicegen</groupId>
+    <groupId>com.flowers.spicegen</groupId>
     <artifactId>spicegen-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
@@ -33,11 +33,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.oviva.spicegen</groupId>
+      <groupId>com.flowers.spicegen</groupId>
       <artifactId>model</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.oviva.spicegen</groupId>
+      <groupId>com.flowers.spicegen</groupId>
       <artifactId>generator</artifactId>
     </dependency>
   </dependencies>
