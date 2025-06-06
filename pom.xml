@@ -19,6 +19,13 @@
       <comments>A business-friendly OSS license</comments>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <id>bschneppe</id>
+      <name>Benedikt Schneppe</name>
+      <url>https://github.com/bschneppe</url>
+    </developer>
+  </developers>
 
   <contributors>
     <contributor>
