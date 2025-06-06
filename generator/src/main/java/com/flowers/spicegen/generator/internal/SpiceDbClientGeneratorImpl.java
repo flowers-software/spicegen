@@ -2,16 +2,40 @@ package com.flowers.spicegen.generator.internal;
 
 import static com.flowers.spicegen.generator.utils.TextUtils.toPascalCase;
 
-import com.flowers.spicegen.api.*;
+import com.flowers.spicegen.api.CheckBulkPermissionItem;
+import com.flowers.spicegen.api.CheckPermission;
+import com.flowers.spicegen.api.Consistency;
+import com.flowers.spicegen.api.ObjectRef;
+import com.flowers.spicegen.api.SubjectRef;
+import com.flowers.spicegen.api.UpdateRelationship;
+import com.flowers.spicegen.api.UpdateRelationship.Caveat;
 import com.flowers.spicegen.generator.Options;
 import com.flowers.spicegen.generator.SpiceDbClientGenerator;
 import com.flowers.spicegen.generator.utils.TextUtils;
-import com.flowers.spicegen.model.*;
-import com.palantir.javapoet.*;
+import com.flowers.spicegen.model.ObjectDefinition;
+import com.flowers.spicegen.model.ObjectTypeRef;
+import com.flowers.spicegen.model.Permission;
+import com.flowers.spicegen.model.Relation;
+import com.flowers.spicegen.model.Schema;
+import com.flowers.spicegen.parser.schema.CaveatNode;
+import com.flowers.spicegen.parser.schema.CaveatParameter;
+import com.palantir.javapoet.ClassName;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.JavaFile;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.ParameterSpec;
+import com.palantir.javapoet.TypeName;
+import com.palantir.javapoet.TypeSpec;
+import com.palantir.javapoet.TypeSpec.Builder;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 
 public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
@@ -119,7 +143,8 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
                       .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                       .returns(ClassName.bestGuess(className))
                       .addParameter(UUID.class, "id")
-                      .addCode("""
+                      .addCode(
+                          """
                               if (id == null) {
                                throw new IllegalArgumentException("id must not be null");
                               }
@@ -138,15 +163,17 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
                       .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                       .returns(ClassName.bestGuess(className))
                       .addParameter(String.class, "id")
-                      .addCode("""
+                      .addCode(
+                          """
                               if (id == null) {
                                throw new IllegalArgumentException("id must not be null");
                               }
                               return new $T(id);""",
                           ClassName.bestGuess(className))
                       .build());
-
-      addUpdateMethods(typedRefBuilder, definition);
+      Map<String, CaveatNode> caveats =
+          spec.caveats().stream().collect(Collectors.toMap(CaveatNode::name, Function.identity()));
+      addUpdateMethods(typedRefBuilder, definition, caveats);
 
       addCheckMethods(typedRefBuilder, definition);
       addBulkCheckMethods(typedRefBuilder, definition);
@@ -173,11 +200,11 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
               .returns(ClassName.get(CheckPermission.class))
               .addCode(
                   """
-                    if ($L == null) {
-                     throw new IllegalArgumentException("subject must not be null");
-                    }
-                    return CheckPermission.newBuilder().resource(this).permission($S).subject($L).consistency($L).build();
-                  """,
+                if ($L == null) {
+                 throw new IllegalArgumentException("subject must not be null");
+                }
+                return CheckPermission.newBuilder().resource(this).permission($S).subject($L).consistency($L).build();
+              """,
                   subjectParamName,
                   permission.name(),
                   subjectParamName,
@@ -201,11 +228,11 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
               .returns(ClassName.get(CheckBulkPermissionItem.class))
               .addCode(
                   """
-                                if ($L == null) {
-                                 throw new IllegalArgumentException("subject must not be null");
-                                }
-                                return CheckBulkPermissionItem.newBuilder().resource(this).permission($S).subject($L).build();
-                              """,
+                if ($L == null) {
+                 throw new IllegalArgumentException("subject must not be null");
+                }
+                return CheckBulkPermissionItem.newBuilder().resource(this).permission($S).subject($L).build();
+              """,
                   subjectParamName,
                   permission.name(),
                   subjectParamName)
@@ -213,7 +240,8 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
     }
   }
 
-  private void addUpdateMethods(TypeSpec.Builder typeRefBuilder, ObjectDefinition definition) {
+  private void addUpdateMethods(
+      Builder typeRefBuilder, ObjectDefinition definition, Map<String, CaveatNode> caveats) {
 
     for (Relation relation : definition.relations()) {
 
@@ -233,25 +261,75 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
         // TODO magic ref
         var typeRefName = toPascalCase(allowedObject.typeName()) + "Ref";
 
-        typeRefBuilder.addMethod(
-            MethodSpec.methodBuilder(createMethod)
-                .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
-                .returns(updateRelationshipTypeName)
-                .addCode(
+        String caveat = allowedObject.caveat();
+        MethodSpec.Builder createMethodBuilder = MethodSpec.methodBuilder(createMethod);
+        createMethodBuilder
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
+            .returns(updateRelationshipTypeName);
+        CodeBlock.Builder codeblockBuilder =
+            CodeBlock.builder()
+                .add(
                     """
-                                if ($L == null) {
-                                 throw new IllegalArgumentException("ref must not be null");
-                                }
-                                return $T.ofUpdate(this, $S, $T.ofObjectWithRelation($L, $S));
-                                """,
+                  if ($L == null) {
+                   throw new IllegalArgumentException("ref must not be null");
+                  }
+                  $T<String, Object> caveatContext = new $T<>();
+                  """,
                     "ref",
-                    updateRelationshipTypeName,
-                    relation.name(),
-                    SubjectRef.class,
-                    "ref",
-                    allowedObject.relationship())
-                .build());
+                    Map.class,
+                    HashMap.class);
+        if (caveat != null) {
+          CaveatNode caveatNode = caveats.get(caveat);
+          for (CaveatParameter parameter : caveatNode.parameters()) {
+            Class<?> parameterType =
+                switch (parameter.type()) {
+                  case "string" -> String.class;
+                  case "int" -> Double.class;
+                  case "uint" -> Double.class;
+                  case "double" -> Double.class;
+                  case "boolean" -> Boolean.class;
+                  default -> Object.class;
+                };
+            createMethodBuilder.addParameter(ClassName.get(parameterType), parameter.name());
+            codeblockBuilder.add(
+                """
+                    if ($L != null) {
+                     caveatContext.put($S, $L);
+                    }
+                    """,
+                parameter.name(),
+                parameter.name(),
+                parameter.name());
+          }
+          codeblockBuilder.add(
+              """
+                  return $T.ofUpdate(this, $S, $T.ofObjectWithRelation($L, $S), new $T($S, caveatContext));
+                  """,
+              updateRelationshipTypeName,
+              relation.name(),
+              SubjectRef.class,
+              "ref",
+              allowedObject.relationship(),
+              Caveat.class,
+              allowedObject.caveat());
+          createMethodBuilder.addCode(codeblockBuilder.build());
+        } else {
+          createMethodBuilder.addCode(
+              """
+                  if ($L == null) {
+                   throw new IllegalArgumentException("ref must not be null");
+                  }
+                  return $T.ofUpdate(this, $S, $T.ofObjectWithRelation($L, $S), null);
+                  """,
+              "ref",
+              updateRelationshipTypeName,
+              relation.name(),
+              SubjectRef.class,
+              "ref",
+              allowedObject.relationship());
+        }
+        typeRefBuilder.addMethod(createMethodBuilder.build());
 
         var deleteMethod =
             "delete%s%s%s"
@@ -263,15 +341,16 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
         typeRefBuilder.addMethod(
             MethodSpec.methodBuilder(deleteMethod)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
+                .addParameter(
+                    ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
                 .returns(ClassName.bestGuess("UpdateRelationship"))
                 .addCode(
                     """
-                                            if ($L == null) {
-                                             throw new IllegalArgumentException("ref must not be null");
-                                            }
-                                            return $T.ofDelete(this, $S, SubjectRef.ofObjectWithRelation($L, $S));
-                                            """,
+                        if ($L == null) {
+                         throw new IllegalArgumentException("ref must not be null");
+                        }
+                        return $T.ofDelete(this, $S, SubjectRef.ofObjectWithRelation($L, $S));
+                        """,
                     "ref",
                     updateRelationshipTypeName,
                     relation.name(),

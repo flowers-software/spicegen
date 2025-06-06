@@ -9,14 +9,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class SpiceDbClientGeneratorImplTest {
 
-  private static final String sourceDirectory = "./out/src/main/java";
-  private static final String sourcePackageName = "com.flowers.spicegen";
+  private static final String SOURCE_DIRECTORY = "./out/src/main/java";
+  private static final String SOURCE_PACKAGE_NAME = "com.flowers.spicegen";
 
   @ParameterizedTest
   @ValueSource(strings = {"files"})
   void test(String schemaName) {
 
-    var generator = new SpiceDbClientGeneratorImpl(new Options(sourceDirectory, sourcePackageName));
+    var generator =
+        new SpiceDbClientGeneratorImpl(new Options(SOURCE_DIRECTORY, SOURCE_PACKAGE_NAME));
     var schema = loadSchema(schemaName);
     generator.generate(schema);
   }

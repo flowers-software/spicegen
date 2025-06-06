@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @JsonSubTypes.Type(value = BaseNode.class, name = "NodeTypeFile"),
   @JsonSubTypes.Type(value = DefinitionNode.class, name = "NodeTypeDefinition"),
   @JsonSubTypes.Type(value = RelationNode.class, name = "NodeTypeRelation"),
+  @JsonSubTypes.Type(value = CaveatNode.class, name = "NodeTypeCaveatDefinition"),
   @JsonSubTypes.Type(value = BaseNode.class, name = "NodeTypeComment"),
   @JsonSubTypes.Type(value = TypeRefNode.class, name = "NodeTypeTypeReference"),
   @JsonSubTypes.Type(value = PermissionNode.class, name = "NodeTypePermission"),
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public sealed interface Node
     permits BaseNode,
+        CaveatNode,
         DefinitionNode,
         PermissionNode,
         RelationNode,

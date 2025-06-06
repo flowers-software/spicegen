@@ -13,12 +13,13 @@ This is a Java generator for SpiceDB schemas which generates:
 - **type-safe relationship updates** - provides factory methods to assemble type-safe relationship updates
 
 
-_This repo is forked from the excellent [oviva-ag/spicegen](https://github.com/oviva-ag/spicegen) project. We would like to thank Thomas Richner for agreeing to us forking and taking over the project from here._
+_This repo is forked from the excellent [oviva-ag/spicegen](https://github.com/oviva-ag/spicegen) project. We would like to thank [Thomas Richner](https://github.com/thomasrichner-oviva) for agreeing to us forking and taking over the project from here._
 
 
 Notable changes:
 - The package name has been changed from `com.oviva.spicegen` to `com.flowers.spicegen`.
 - The `*Ref` classes have been migrated to be records
+- Added caveat support
 
 ## Getting Started
 

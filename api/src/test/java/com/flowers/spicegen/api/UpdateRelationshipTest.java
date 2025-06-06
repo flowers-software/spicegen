@@ -3,6 +3,8 @@ package com.flowers.spicegen.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import com.flowers.spicegen.api.UpdateRelationship.Caveat;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +25,7 @@ class UpdateRelationshipTest {
     var resource = ObjectRef.of(TENANT, NAMESPACE_ID);
     var subject = ObjectRef.of(TENANT, NAMESPACE_ID);
 
-    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject);
+    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject, null);
 
     assertEquals(UpdateRelationship.Operation.UPDATE, updateRelationship.operation());
     assertEquals(ADMINISTRATOR, updateRelationship.relation());
@@ -38,7 +40,7 @@ class UpdateRelationshipTest {
     var subject =
         SubjectRef.ofObjectWithRelation(ObjectRef.of(TENANT, NAMESPACE_ID), OPTIONAL_RELATIONSHIP);
 
-    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject);
+    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject, null);
 
     assertEquals(UpdateRelationship.Operation.UPDATE, updateRelationship.operation());
     assertEquals(ADMINISTRATOR, updateRelationship.relation());
@@ -79,11 +81,17 @@ class UpdateRelationshipTest {
   void of_hashCode() {
     var h1 =
         UpdateRelationship.ofUpdate(
-            ObjectRef.of(DOCUMENT, DOCUMENT_ID), ADMINISTRATOR, ObjectRef.of(TENANT, TENANT_ID));
+            ObjectRef.of(DOCUMENT, DOCUMENT_ID),
+            ADMINISTRATOR,
+            ObjectRef.of(TENANT, TENANT_ID),
+            null);
 
     var h2 =
         UpdateRelationship.ofUpdate(
-            ObjectRef.of(DOCUMENT, DOCUMENT_ID), ADMINISTRATOR, ObjectRef.of(TENANT, TENANT_ID));
+            ObjectRef.of(DOCUMENT, DOCUMENT_ID),
+            ADMINISTRATOR,
+            ObjectRef.of(TENANT, TENANT_ID),
+            null);
 
     assertEquals(h1.hashCode(), h2.hashCode());
   }
@@ -92,7 +100,10 @@ class UpdateRelationshipTest {
   void of_equals_same() {
     var u1 =
         UpdateRelationship.ofUpdate(
-            ObjectRef.of(DOCUMENT, DOCUMENT_ID), ADMINISTRATOR, ObjectRef.of(TENANT, TENANT_ID));
+            ObjectRef.of(DOCUMENT, DOCUMENT_ID),
+            ADMINISTRATOR,
+            ObjectRef.of(TENANT, TENANT_ID),
+            null);
 
     assertEquals(u1, u1);
   }
@@ -121,7 +132,7 @@ class UpdateRelationshipTest {
     var u1 = createUpdateDocumentOwnedByUser(subjectUuid);
     var u2 =
         UpdateRelationship.ofUpdate(
-            u1.resource(), u1.relation(), ObjectRef.of("another", u1.subject().id()));
+            u1.resource(), u1.relation(), ObjectRef.of("another", u1.subject().id()), null);
 
     assertNotEquals(u1, u2);
   }
@@ -133,7 +144,7 @@ class UpdateRelationshipTest {
     var u1 = createUpdateDocumentOwnedByUser(subjectUuid);
     var u2 =
         UpdateRelationship.ofUpdate(
-            u1.resource(), u1.relation(), ObjectRef.of(u1.subject().kind(), "992982"));
+            u1.resource(), u1.relation(), ObjectRef.of(u1.subject().kind(), "992982"), null);
 
     assertNotEquals(u1, u2);
   }
@@ -157,7 +168,7 @@ class UpdateRelationshipTest {
   private UpdateRelationship createUpdateDocumentOwnedByUser(UUID subjectUuid) {
 
     return UpdateRelationship.ofUpdate(
-        ObjectRef.of("document", "1"), "owner", ObjectRef.of("user", subjectUuid.toString()));
+        ObjectRef.of("document", "1"), "owner", ObjectRef.of("user", subjectUuid.toString()), null);
   }
 
   @Test
@@ -166,8 +177,8 @@ class UpdateRelationshipTest {
     var sub = ObjectRef.of("user", "18");
     var relation = "owner";
 
-    var u = UpdateRelationship.ofUpdate(obj, relation, sub);
-    assertEquals("UPDATE(document:4#owner@user:18)", u.toString());
+    var u = UpdateRelationship.ofUpdate(obj, relation, sub, new Caveat("caveat", Map.of("key", "value")));
+    assertEquals("UPDATE(document:4#owner@user:18) with {\"key\": value}", u.toString());
   }
 
   @Test
@@ -178,13 +189,13 @@ class UpdateRelationshipTest {
 
     var u =
         UpdateRelationship.ofUpdate(
-            obj, relation, SubjectRef.ofObjectWithRelation(sub, OPTIONAL_RELATIONSHIP));
+            obj, relation, SubjectRef.ofObjectWithRelation(sub, OPTIONAL_RELATIONSHIP), null);
     assertEquals("UPDATE(document:4#owner@user:18#boss)", u.toString());
   }
 
   @Test
   void of_toString_null() {
-    var u = UpdateRelationship.ofUpdate(null, null, (ObjectRef) null);
+    var u = UpdateRelationship.ofUpdate(null, null, (ObjectRef) null, null);
     assertEquals("UPDATE(#@)", u.toString());
   }
 }

@@ -10,5 +10,6 @@ public enum NodeType {
   NodeTypePermission,
   NodeTypeTypeReference,
   NodeTypeSpecificTypeReference,
-  NodeTypeIdentifier
+  NodeTypeIdentifier,
+  NodeTypeCaveatDefinition
 }

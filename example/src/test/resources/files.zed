@@ -4,10 +4,14 @@ definition team {
 	relation member: user
 }
 
+caveat is_senior(age int) {
+  age>65
+}
 
 definition folder {
     relation reader: user | team#member
-    permission read = reader
+    relation aged_reader: user with is_senior
+    permission read = reader + aged_reader
 }
 
 definition document {

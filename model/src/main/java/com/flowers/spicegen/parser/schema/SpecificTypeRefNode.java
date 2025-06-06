@@ -10,12 +10,19 @@ public final class SpecificTypeRefNode extends AbstractNode implements Node {
   @JsonProperty("relation_name")
   private String relationName;
 
+  @JsonProperty("caveat")
+  private String caveat;
+
   public String typeName() {
     return typeName;
   }
 
   public String relationName() {
     return relationName;
+  }
+
+  public String caveat() {
+    return caveat;
   }
 
   @Override
@@ -29,6 +36,8 @@ public final class SpecificTypeRefNode extends AbstractNode implements Node {
         + '\''
         + ", nodeType="
         + nodeType
+        + ", caveat="
+        + caveat
         + ", children="
         + children
         + '}';

@@ -1,12 +1,12 @@
 package com.flowers.spicegen;
 
-import com.flowers.spicegen.permissions.refs.UserRef;
-import java.util.Set;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.flowers.spicegen.permissions.refs.UserRef;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 class HashCodeEqualsTest {
 
@@ -24,9 +24,10 @@ class HashCodeEqualsTest {
 
   @Test
   void testHashCodeEqualsShouldNotMatch() {
-    assertNotEquals(UserRef.of("123").hashCode(), UserRef.of("321").hashCode(),
+    assertNotEquals(
+        UserRef.of("123").hashCode(),
+        UserRef.of("321").hashCode(),
         "Hash codes should not be equal");
     assertNotEquals(UserRef.of("321"), UserRef.of("123"), "Objects should not be equal");
   }
 }
-
