@@ -3,5 +3,6 @@
   extends: [
     'local>flowers-software/renovate-config',
     'local>flowers-software/renovate-config:automerge',
-  ]
+  ],
+  forkProcessing: 'enabled'
 }

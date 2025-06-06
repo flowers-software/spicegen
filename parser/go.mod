@@ -1,7 +1,8 @@
 module github.com/flowers-software/spicegen/parser
 
-go 1.22.2
-toolchain go1.23.6
+go 1.22.7
+
+toolchain go1.24.2
 
 require github.com/authzed/spicedb v1.37.1
 

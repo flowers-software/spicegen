@@ -1,9 +1,6 @@
-name: run unit tests
+name: Pull Request Coverage Report
 
 on:
-  push:
-    branches:
-      - 'main'
   pull_request:
     paths-ignore:
       - '.github/**'
