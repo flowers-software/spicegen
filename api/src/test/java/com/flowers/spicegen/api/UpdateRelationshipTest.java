@@ -3,6 +3,8 @@ package com.flowers.spicegen.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import com.flowers.spicegen.api.UpdateRelationship.Caveat;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -175,8 +177,8 @@ class UpdateRelationshipTest {
     var sub = ObjectRef.of("user", "18");
     var relation = "owner";
 
-    var u = UpdateRelationship.ofUpdate(obj, relation, sub, null);
-    assertEquals("UPDATE(document:4#owner@user:18)", u.toString());
+    var u = UpdateRelationship.ofUpdate(obj, relation, sub, new Caveat("caveat", Map.of("key", "value")));
+    assertEquals("UPDATE(document:4#owner@user:18) with {\"key\": value}", u.toString());
   }
 
   @Test

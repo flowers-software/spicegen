@@ -15,10 +15,10 @@ public record UpdateRelationshipImpl(
     var sub = subject != null ? subject.toString() : "";
     StringBuilder caveatContextBuilder = new StringBuilder();
     if (caveat != null && !caveat.context().isEmpty()) {
-      caveatContextBuilder.append("with");
+      caveatContextBuilder.append(" with ");
       caveatContextBuilder.append("{");
       for (Map.Entry<String, Object> entry : caveat.context().entrySet()) {
-        if (caveatContextBuilder.length() > 1) {
+        if (caveatContextBuilder.length() > 7) {
           caveatContextBuilder.append(", ");
         }
         caveatContextBuilder
