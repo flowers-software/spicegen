@@ -16,7 +16,8 @@ class SpiceDbClientGeneratorImplTest {
   @ValueSource(strings = {"files"})
   void test(String schemaName) {
 
-    var generator = new SpiceDbClientGeneratorImpl(new Options(SOURCE_DIRECTORY, SOURCE_PACKAGE_NAME));
+    var generator =
+        new SpiceDbClientGeneratorImpl(new Options(SOURCE_DIRECTORY, SOURCE_PACKAGE_NAME));
     var schema = loadSchema(schemaName);
     generator.generate(schema);
   }

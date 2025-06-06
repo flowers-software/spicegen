@@ -143,7 +143,8 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
                       .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                       .returns(ClassName.bestGuess(className))
                       .addParameter(UUID.class, "id")
-                      .addCode("""
+                      .addCode(
+                          """
                               if (id == null) {
                                throw new IllegalArgumentException("id must not be null");
                               }
@@ -162,7 +163,8 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
                       .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                       .returns(ClassName.bestGuess(className))
                       .addParameter(String.class, "id")
-                      .addCode("""
+                      .addCode(
+                          """
                               if (id == null) {
                                throw new IllegalArgumentException("id must not be null");
                               }
@@ -302,17 +304,15 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
           }
           codeblockBuilder.add(
               """
-                  UpdateRelationship.Caveat caveat= caveatContext.isEmpty()? null : new $T($S, caveatContext);
-
-                  return $T.ofUpdate(this, $S, $T.ofObjectWithRelation($L, $S), caveat);
+                  return $T.ofUpdate(this, $S, $T.ofObjectWithRelation($L, $S), new $T($S, caveatContext));
                   """,
-              Caveat.class,
-              allowedObject.caveat(),
               updateRelationshipTypeName,
               relation.name(),
               SubjectRef.class,
               "ref",
-              allowedObject.relationship());
+              allowedObject.relationship(),
+              Caveat.class,
+              allowedObject.caveat());
           createMethodBuilder.addCode(codeblockBuilder.build());
         } else {
           createMethodBuilder.addCode(
@@ -341,7 +341,8 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
         typeRefBuilder.addMethod(
             MethodSpec.methodBuilder(deleteMethod)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
+                .addParameter(
+                    ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
                 .returns(ClassName.bestGuess("UpdateRelationship"))
                 .addCode(
                     """

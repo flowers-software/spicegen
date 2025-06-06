@@ -29,7 +29,7 @@ public class UpdateRelationshipMapper {
             .setRelation(updateRelationship.relation())
             .setSubject(subjectRef)
             .setResource(resourceRef);
-    if (updateRelationship.caveat() != null && !updateRelationship.caveat().context().isEmpty()) {
+    if (updateRelationship.caveat() != null) {
 
       Struct.Builder structBuilder = Struct.newBuilder();
       for (Entry<String, Object> keyToValue : updateRelationship.caveat().context().entrySet()) {
