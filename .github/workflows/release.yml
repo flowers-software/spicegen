@@ -45,7 +45,7 @@ jobs:
         run: make build
       - name: Publish package
         run: |
-          echo -n "$MAVEN_GPG_KEY" | gpg --import
+          echo -n "$MAVEN_GPG_KEY" | base64 --decode | gpg --import
           mvn --batch-mode -Prelease deploy
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
