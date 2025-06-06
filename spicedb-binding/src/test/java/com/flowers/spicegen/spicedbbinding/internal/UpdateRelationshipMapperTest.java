@@ -24,7 +24,7 @@ class UpdateRelationshipMapperTest {
     var resource = ObjectRef.of(TENANT, ID);
     var subject = ObjectRef.of(USER, ID);
 
-    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject);
+    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject, null);
     var map = mapper.map(updateRelationship);
 
     assertEquals(RelationshipUpdate.Operation.OPERATION_TOUCH, map.getOperation());

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-public class UpdateRelationshipsTest {
+class UpdateRelationshipsTest {
 
   private static final String PATIENT_ID = UUID.randomUUID().toString().replaceAll("-", "");
   private static final String TENANT_ID = UUID.randomUUID().toString().replaceAll("-", "");
@@ -16,8 +16,7 @@ public class UpdateRelationshipsTest {
   private static final String ADMINISTRATOR = "administrator";
 
   @Test
-  public void test_updateRelationships_ownBuilder() {
-
+  void test_updateRelationshipsBuilder() {
     var updates = getUpdateRelationshipList();
     var preconditions = getPreconditionList();
 
@@ -29,19 +28,7 @@ public class UpdateRelationshipsTest {
   }
 
   @Test
-  public void test_updateRelationshipsBuilder() {
-    var updates = getUpdateRelationshipList();
-    var preconditions = getPreconditionList();
-
-    var updateRelationships =
-        UpdateRelationships.newBuilder().updates(updates).preconditions(preconditions).build();
-
-    assertEquals(updateRelationships.updates(), updates);
-    assertEquals(updateRelationships.preconditions(), preconditions);
-  }
-
-  @Test
-  public void test_updateRelationshipsBuilder_withAddOperations() {
+  void test_updateRelationshipsBuilder_withAddOperations() {
 
     var userId = UUID.randomUUID();
     var subject = ObjectRef.of("user", userId.toString());
@@ -59,7 +46,7 @@ public class UpdateRelationshipsTest {
                         .build())
                 .build());
 
-    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject);
+    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject, null);
 
     var updateRelationships =
         UpdateRelationships.newBuilder()
@@ -104,7 +91,7 @@ public class UpdateRelationshipsTest {
     var resource = ObjectRef.of(TENANT, id);
     var subject = ObjectRef.of(TENANT, id);
 
-    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject);
+    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject, null);
 
     return List.of(updateRelationship);
   }

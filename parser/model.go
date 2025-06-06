@@ -95,6 +95,7 @@ type SpecificTypeRefNode struct {
 	BaseNode
 	TypeName     string  `json:"type_name"`
 	RelationName *string `json:"relation_name,omitempty"`
+	Caveat       *string `json:"caveat,omitempty"`
 }
 type TypeRefNode struct {
 	BaseNode
@@ -110,6 +111,17 @@ type PermissionNode struct {
 	BaseNode
 	Name string `json:"name"`
 }
+type CaveatParameter struct {
+	BaseNode
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+type CaveatNode struct {
+	BaseNode
+	Name       string             `json:"name"`
+	Parameters []*CaveatParameter `json:"parameters,omitempty"`
+}
 
 func parse(root *astNode) Node {
 	switch root.nodeType {
@@ -121,6 +133,8 @@ func parse(root *astNode) Node {
 		return parseRelationNode(root)
 	case dslshape.NodeTypePermission:
 		return parsePermissionNode(root)
+	case dslshape.NodeTypeCaveatDefinition:
+		return parseCaveatNode(root)
 	default:
 		bn := &BaseNode{}
 		populateBaseNode(bn, root)
@@ -189,12 +203,53 @@ func parseSpecificTypeRefTypeNode(root *astNode) *SpecificTypeRefNode {
 		name := fromRelationName.(string)
 		relationName = &name
 	}
+	caveat := root.children[dslshape.NodeSpecificReferencePredicateCaveat]
+	caveatName := (*string)(nil)
+	if caveat != nil && caveat.Len() > 0 {
+		caveatNameAsString := caveat.Front().Value.(*astNode).properties[dslshape.NodeCaveatPredicateCaveat].(string)
+		caveatName = &caveatNameAsString
+	}
 	n := &SpecificTypeRefNode{
 		TypeName:     root.properties[dslshape.NodeSpecificReferencePredicateType].(string),
 		RelationName: relationName,
+		Caveat:       caveatName,
 	}
 	populateBaseNode(&n.BaseNode, root)
 	return n
+}
+
+func parseCaveatNode(root *astNode) Node {
+
+	fromParameters := root.children[dslshape.NodeCaveatDefinitionPredicateParameters]
+	mappedChildren := make([]*CaveatParameter, fromParameters.Len())
+	i := 0
+	for e := fromParameters.Front(); e != nil; e = e.Next() {
+		paramNode := e.Value.(*astNode)
+		paramName := paramNode.properties[dslshape.NodeCaveatParameterPredicateName]
+		paramType := paramNode.children[dslshape.NodeCaveatParameterPredicateType]
+		var paramTypeString string
+		if paramType != nil && paramType.Len() > 0 {
+			// We expect only one type for a caveat parameter.
+			node := paramType.Front().Value.(*astNode)
+			paramTypeString = node.properties["type-name"].(string)
+		}
+		mappedChildren[i] = &CaveatParameter{
+			Name: paramName.(string),
+			Type: paramTypeString,
+		}
+		populateBaseNode(&mappedChildren[i].BaseNode, paramNode)
+		i++
+	}
+	println(mappedChildren)
+
+	node := &CaveatNode{
+		Name:       root.properties[dslshape.NodeCaveatDefinitionPredicateName].(string),
+		Parameters: mappedChildren,
+	}
+
+	populateBaseNode(&node.BaseNode, root)
+
+	return node
 }
 
 func parsePermissionNode(root *astNode) Node {

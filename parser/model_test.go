@@ -22,7 +22,7 @@ func TestParseBasic(t *testing.T) {
 
 func TestFixtures(t *testing.T) {
 	cases := []string{
-		"files", "groups", "platform", "recursive", "synthetic",
+		"files", "groups", "platform", "recursive", "synthetic", "caveat",
 	}
 
 	for _, tc := range cases {

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class SpiceDbSchemaParser {
 
-  private static Logger logger = LoggerFactory.getLogger(SpiceDbSchemaParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SpiceDbSchemaParser.class);
 
   public Schema parse(Path schema) {
 
@@ -31,13 +31,13 @@ public class SpiceDbSchemaParser {
 
       astPath = Files.createTempFile("%s_ast_".formatted(name), ".json");
 
-      logger.info("pre-processing schema into AST from {} to {}", schema, astPath);
+      LOGGER.info("pre-processing schema into AST from {} to {}", schema, astPath);
       preprocessor.parse(astPath, schema);
 
-      logger.info("loading AST from {}", astPath);
+      LOGGER.info("loading AST from {}", astPath);
       var root = loadAst(astPath);
 
-      logger.debug("parsing schema from AST");
+      LOGGER.debug("parsing schema from AST");
       var definitions =
           streamNullable(root.unwrap(BaseNode.class).children())
               .filter(byKind(NodeType.NodeTypeDefinition))
@@ -45,11 +45,17 @@ public class SpiceDbSchemaParser {
               .map(this::mapDefinition)
               .toList();
 
-      logger.debug("schema parsed");
+      var caveats =
+          streamNullable(root.unwrap(BaseNode.class).children())
+              .filter(byKind(NodeType.NodeTypeCaveatDefinition))
+              .map(d -> d.unwrap(CaveatNode.class))
+              .toList();
 
-      return new Schema(definitions);
+      LOGGER.debug("schema parsed");
+
+      return new Schema(definitions, caveats);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     } finally {
       deleteQuietly(astPath);
     }
@@ -111,8 +117,8 @@ public class SpiceDbSchemaParser {
             .map(node -> node.unwrap(TypeRefNode.class))
             .flatMap(t -> t.typeRefTypes().stream())
             .filter(byKind(NodeType.NodeTypeSpecificTypeReference))
-            .map(node -> (SpecificTypeRefNode) node)
-            .map(node -> new ObjectTypeRef(node.typeName(), node.relationName()))
+            .map(SpecificTypeRefNode.class::cast)
+            .map(node -> new ObjectTypeRef(node.typeName(), node.relationName(), node.caveat()))
             .toList();
 
     return new Relation(n.name(), allowedTypes);
@@ -130,7 +136,6 @@ public class SpiceDbSchemaParser {
 
     var om = new ObjectMapper();
     om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    var root = om.readValue(is, Node.class);
-    return root;
+    return om.readValue(is, Node.class);
   }
 }

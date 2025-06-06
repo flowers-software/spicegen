@@ -21,7 +21,9 @@ class SpiceDbPermissionServiceImplTest {
     var o = ObjectRef.of("file", "/test.txt");
     var s = ObjectRef.of("user", "bob");
     var updates =
-        UpdateRelationships.newBuilder().update(UpdateRelationship.ofUpdate(o, "owner", s)).build();
+        UpdateRelationships.newBuilder()
+            .update(UpdateRelationship.ofUpdate(o, "owner", s, null))
+            .build();
 
     var token = "atXyz";
     var res =

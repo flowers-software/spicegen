@@ -1,0 +1,13 @@
+definition user {}
+definition team {
+	relation member: user
+}
+
+caveat has_access_to_a_car(cars_they_have_access_to int) {
+  cars_they_have_access_to>1
+}
+
+definition garage {
+	relation can_drive_car:user with has_access_to_a_car |  team#member with has_access_to_a_car
+}
+

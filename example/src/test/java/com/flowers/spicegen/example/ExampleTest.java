@@ -35,7 +35,7 @@ class ExampleTest {
   private static final Logger logger = LoggerFactory.getLogger(ExampleTest.class);
 
   @Container
-  private GenericContainer<?> spicedb =
+  private static final  GenericContainer<?> spicedb =
       new GenericContainer<>(DockerImageName.parse("authzed/spicedb:v1.41.0"))
           .withCommand("serve", "--grpc-preshared-key", TOKEN)
           .waitingFor(Wait.forLogMessage(".*\"grpc server started serving\".*", 1))
@@ -85,6 +85,8 @@ class ExampleTest {
 
     // typesafe object references!
     var user = UserRef.ofLong(userId);
+    var seniorUser = UserRef.ofLong(123);
+    var minorUser = UserRef.ofLong(321);
     var userInTeam = UserRef.ofLong(42);
     var team = TeamRef.ofLong(42);
     var folder = FolderRef.of("home");
@@ -96,6 +98,8 @@ class ExampleTest {
             UpdateRelationships.newBuilder()
                 // note the generated factory methods!
                 .update(folder.createReaderUser(user))
+                .update(folder.createAgedReaderUser(seniorUser, 69D))
+                .update(folder.createAgedReaderUser(minorUser, 13D))
                 .update(team.createMemberUser(userInTeam))
                 .update(folder.createReaderTeamMember(team))
                 .update(document.createParentFolderFolder(folder))
@@ -108,6 +112,16 @@ class ExampleTest {
         permissionService.checkPermission(
             document.checkRead(
                 SubjectRef.ofObject(user), Consistency.atLeastAsFreshAs(consistencyToken))));
+
+    assertTrue(
+        permissionService.checkPermission(
+            document.checkRead(
+                SubjectRef.ofObject(seniorUser), Consistency.atLeastAsFreshAs(consistencyToken))));
+
+    assertFalse(
+        permissionService.checkPermission(
+            document.checkRead(
+                SubjectRef.ofObject(minorUser), Consistency.atLeastAsFreshAs(consistencyToken))));
 
     assertTrue(
         permissionService.checkPermission(
