@@ -10,16 +10,6 @@
   <artifactId>generator</artifactId>
   <name>Spicegen Generator</name>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.squareup</groupId>
-        <artifactId>javapoet</artifactId>
-        <version>1.13.0</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -35,8 +25,9 @@
       <artifactId>model</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.squareup</groupId>
+      <groupId>com.palantir.javapoet</groupId>
       <artifactId>javapoet</artifactId>
+      <version>0.7.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
