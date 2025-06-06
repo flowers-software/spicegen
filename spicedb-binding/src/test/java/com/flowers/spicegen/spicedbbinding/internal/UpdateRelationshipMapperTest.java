@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.authzed.api.v1.RelationshipUpdate;
 import com.flowers.spicegen.api.ObjectRef;
 import com.flowers.spicegen.api.UpdateRelationship;
+import com.flowers.spicegen.api.UpdateRelationship.Caveat;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class UpdateRelationshipMapperTest {
@@ -24,7 +26,7 @@ class UpdateRelationshipMapperTest {
     var resource = ObjectRef.of(TENANT, ID);
     var subject = ObjectRef.of(USER, ID);
 
-    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject, null);
+    var updateRelationship = UpdateRelationship.ofUpdate(resource, ADMINISTRATOR, subject, new Caveat("caveat", Map.of("key", "value","key2", 123.45, "key3", true)));
     var map = mapper.map(updateRelationship);
 
     assertEquals(RelationshipUpdate.Operation.OPERATION_TOUCH, map.getOperation());
@@ -32,6 +34,7 @@ class UpdateRelationshipMapperTest {
     assertEquals(ADMINISTRATOR, map.getRelationship().getRelation());
     assertEquals(ID, map.getRelationship().getResource().getObjectId());
     assertEquals(TENANT, map.getRelationship().getResource().getObjectType());
+    assertNotNull(map.getRelationship().getOptionalCaveat());
   }
 
   @Test
