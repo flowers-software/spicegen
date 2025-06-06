@@ -24,8 +24,9 @@ Notable changes:
 **Prerequistes:**
 
 
-1. Add the  `com.flowers.spicegen:api` dependency
-2. Add the  `com.flowers.spicegen:spicegen-maven-plugin` plugin
+1. Add the  `com.flowers-software.spicegen:api` dependency
+1. Add the  `com.flowers-software.spicegen:spicedb-binding` dependency
+2. Add the  `com.flowers-software.spicegen:spicegen-maven-plugin` plugin
 
 Example `pom.xml`
 
@@ -33,7 +34,7 @@ Example `pom.xml`
 <!-- ... -->
 <dependencies>
     <dependency>
-        <groupId>com.flowers.spicegen</groupId>
+        <groupId>com.flowers-software.spicegen</groupId>
         <artifactId>api</artifactId>
         <version>${spicegen.version}</version>
     </dependency>
@@ -41,7 +42,7 @@ Example `pom.xml`
 <!-- ... -->
 <plugins>
 <plugin>
-    <groupId>com.flowers.spicegen</groupId>
+    <groupId>com.flowers-software.spicegen</groupId>
     <artifactId>spicegen-maven-plugin</artifactId>
     <version>${spicegen.version}</version>
     <executions>

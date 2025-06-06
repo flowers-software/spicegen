@@ -12,12 +12,12 @@ Example [pom.xml](./pom.xml)
 
     <dependencies>
         <dependency>
-            <groupId>com.flowers.spicegen</groupId>
+            <groupId>com.flowers-software.spicegen</groupId>
             <artifactId>api</artifactId>
             <version>...</version>
         </dependency>
         <dependency>
-            <groupId>com.flowers.spicegen</groupId>
+            <groupId>com.flowers-software.spicegen</groupId>
             <artifactId>spicedb-binding</artifactId>
             <version>...</version>
         </dependency>
@@ -28,7 +28,7 @@ Example [pom.xml](./pom.xml)
     <build>
         <plugins>
             <plugin>
-                <groupId>com.flowers.spicegen</groupId>
+                <groupId>com.flowers-software.spicegen</groupId>
                 <artifactId>spicegen-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
