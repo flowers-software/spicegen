@@ -7,18 +7,16 @@ import com.flowers.spicegen.generator.Options;
 import com.flowers.spicegen.generator.SpiceDbClientGenerator;
 import com.flowers.spicegen.generator.utils.TextUtils;
 import com.flowers.spicegen.model.*;
-import com.squareup.javapoet.*;
+import com.palantir.javapoet.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import javax.lang.model.element.Modifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
 
-  private static Logger logger = LoggerFactory.getLogger(SpiceDbClientGeneratorImpl.class);
+  private static final String REFS_PACKAGE = ".refs";
   private final TypeName objectRefTypeName = ClassName.get(ObjectRef.class);
   private final TypeName updateRelationshipTypeName = ClassName.get(UpdateRelationship.class);
 
@@ -80,7 +78,7 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
     }
 
     var constantsClass = constants.build();
-    if (typeSpecStore.has(constantsClass.name)) {
+    if (typeSpecStore.has(constantsClass.name())) {
       return;
     }
     typeSpecStore.put(constantsClass);
@@ -91,8 +89,8 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
 
     for (ObjectDefinition definition : spec.definitions()) {
       var className = TextUtils.capitalize(TextUtils.toCamelCase(definition.name())) + "Ref";
-      var typedRef = TypeSpec.classBuilder(className).build();
-      if (typeSpecStore.has(typedRef.name)) {
+      var typedRef = TypeSpec.recordBuilder(className).build();
+      if (typeSpecStore.has(typedRef.name())) {
         return;
       }
       typeSpecStore.put(typedRef);
@@ -103,38 +101,29 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
               .addModifiers(Modifier.PUBLIC)
               .addField(
                   FieldSpec.builder(
-                          String.class, "kind", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                          String.class, "KIND", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                       .initializer("$S", definition.name())
                       .build())
-              .addField(String.class, "id", Modifier.PRIVATE, Modifier.FINAL)
-              .addMethod(
+              .recordConstructor(
                   MethodSpec.constructorBuilder()
-                      .addModifiers(Modifier.PRIVATE)
-                      .addParameter(String.class, "id")
-                      .addStatement("this.id = id")
+                      .addParameter(ParameterSpec.builder(String.class, "id").build())
                       .build())
               .addMethod(
                   MethodSpec.methodBuilder("kind")
                       .addModifiers(Modifier.PUBLIC)
                       .returns(String.class)
-                      .addCode(CodeBlock.builder().addStatement("return kind").build())
-                      .build())
-              .addMethod(
-                  MethodSpec.methodBuilder("id")
-                      .addModifiers(Modifier.PUBLIC)
-                      .returns(String.class)
-                      .addCode(CodeBlock.builder().addStatement("return id").build())
+                      .addCode(CodeBlock.builder().addStatement("return KIND").build())
                       .build())
               .addMethod(
                   MethodSpec.methodBuilder("ofUuid")
                       .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                       .returns(ClassName.bestGuess(className))
                       .addParameter(UUID.class, "id")
-                      .addCode(
-                          "if (id == null) {\n"
-                              + " throw new IllegalArgumentException(\"id must not be null\");\n"
-                              + "}\n"
-                              + "return new $T(id.toString());",
+                      .addCode("""
+                              if (id == null) {
+                               throw new IllegalArgumentException("id must not be null");
+                              }
+                              return new $T(id.toString());""",
                           ClassName.bestGuess(className))
                       .build())
               .addMethod(
@@ -149,11 +138,11 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
                       .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                       .returns(ClassName.bestGuess(className))
                       .addParameter(String.class, "id")
-                      .addCode(
-                          "if (id == null) {\n"
-                              + " throw new IllegalArgumentException(\"id must not be null\");\n"
-                              + "}\n"
-                              + "return new $T(id);",
+                      .addCode("""
+                              if (id == null) {
+                               throw new IllegalArgumentException("id must not be null");
+                              }
+                              return new $T(id);""",
                           ClassName.bestGuess(className))
                       .build());
 
@@ -163,7 +152,7 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
       addBulkCheckMethods(typedRefBuilder, definition);
 
       typedRef = typedRefBuilder.build();
-      writeSource(typedRef, ".refs");
+      writeSource(typedRef, REFS_PACKAGE);
     }
   }
 
@@ -247,7 +236,7 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
         typeRefBuilder.addMethod(
             MethodSpec.methodBuilder(createMethod)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(options.packageName() + ".refs", typeRefName), "ref")
+                .addParameter(ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
                 .returns(updateRelationshipTypeName)
                 .addCode(
                     """
@@ -274,7 +263,7 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
         typeRefBuilder.addMethod(
             MethodSpec.methodBuilder(deleteMethod)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(options.packageName() + ".refs", typeRefName), "ref")
+                .addParameter(ClassName.get(options.packageName() + REFS_PACKAGE, typeRefName), "ref")
                 .returns(ClassName.bestGuess("UpdateRelationship"))
                 .addCode(
                     """

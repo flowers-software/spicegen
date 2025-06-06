@@ -18,6 +18,7 @@ _This repo is forked from the excellent [oviva-ag/spicegen](https://github.com/o
 
 Notable changes:
 - The package name has been changed from `com.oviva.spicegen` to `com.flowers.spicegen`.
+- The `*Ref` classes have been migrated to be records
 
 ## Getting Started
 

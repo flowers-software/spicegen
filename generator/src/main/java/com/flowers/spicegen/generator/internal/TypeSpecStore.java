@@ -1,6 +1,6 @@
 package com.flowers.spicegen.generator.internal;
 
-import com.squareup.javapoet.TypeSpec;
+import com.palantir.javapoet.TypeSpec;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,7 +11,7 @@ public class TypeSpecStore implements Iterable<TypeSpec> {
   private Map<String, TypeSpec> types = new HashMap<>();
 
   public void put(TypeSpec spec) {
-    types.put(spec.name, spec);
+    types.put(spec.name(), spec);
   }
 
   public boolean has(String name) {
