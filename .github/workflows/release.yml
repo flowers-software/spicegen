@@ -21,7 +21,7 @@ jobs:
           server-password: MAVEN_CENTRAL_PASSWORD
           cache: 'maven'
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
