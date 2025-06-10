@@ -16,6 +16,10 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -148,6 +152,24 @@ class ExampleTest {
     assertEquals(2, checkPermissions.size());
     assertTrue(checkPermissions.get(0).permissionGranted());
     assertFalse(checkPermissions.get(1).permissionGranted());
+    Iterator<ObjectRef> usersAllowedToRead =
+        permissionService.lookupSubjects(document.lookupSubjectsReadUser());
+    assertTrue(usersAllowedToRead.hasNext());
+    // usersAllowedToRead contains both userId and user2
+    var userIds =
+        StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(usersAllowedToRead, Spliterator.ORDERED), false)
+            .map(ObjectRef::id)
+            .toList();
+    assertEquals(4, userIds.size());
+    assertTrue(userIds.contains(user.id()));
+    assertTrue(userIds.contains(userInTeam.id()));
+
+    // Example: find teams allowed to read the folder
+    Iterator<ObjectRef> teamsAllowedToRead =
+        permissionService.lookupSubjects(folder.lookupSubjectsReadTeamMember());
+    assertTrue(teamsAllowedToRead.hasNext());
+    assertEquals(team.id(), teamsAllowedToRead.next().id());
   }
 
   private String loadSchema() {

@@ -13,7 +13,7 @@ class SpiceDbClientGeneratorImplTest {
   private static final String SOURCE_PACKAGE_NAME = "com.flowers.spicegen";
 
   @ParameterizedTest
-  @ValueSource(strings = {"files"})
+  @ValueSource(strings = {"files", "files_with_caveat"})
   void test(String schemaName) {
 
     var generator =
