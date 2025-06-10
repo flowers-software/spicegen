@@ -11,3 +11,6 @@ build:
 
 fmt:
 	gofumpt -w .
+
+test:
+	go test -v ./...

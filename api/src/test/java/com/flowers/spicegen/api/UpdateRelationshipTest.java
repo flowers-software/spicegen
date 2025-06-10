@@ -177,7 +177,9 @@ class UpdateRelationshipTest {
     var sub = ObjectRef.of("user", "18");
     var relation = "owner";
 
-    var u = UpdateRelationship.ofUpdate(obj, relation, sub, new Caveat("caveat", Map.of("key", "value")));
+    var u =
+        UpdateRelationship.ofUpdate(
+            obj, relation, sub, new Caveat("caveat", Map.of("key", "value")));
     assertEquals("UPDATE(document:4#owner@user:18) with {\"key\": value}", u.toString());
   }
 

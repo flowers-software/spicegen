@@ -50,5 +50,14 @@ jobs:
           echo "| <!-- -->    | <!-- -->    |" >> $GITHUB_STEP_SUMMARY
           echo "|-------------|-------------|" >> $GITHUB_STEP_SUMMARY
           echo "| Project Code Coverage % | ${{ steps.jacoco.outputs.coverage-overall }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| PR Code Coverage % | ${{ steps.jacoco.outputs.coverage-changed-files }} |" >> $GITHUB_STEP_SUMMARY  
+          echo "| PR Code Coverage % | ${{ steps.jacoco.outputs.coverage-changed-files }} |" >> $GITHUB_STEP_SUMMARY
+  test-parser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+      - name: run parser tests
+        working-directory: parser
+        run: make test
 
