@@ -81,7 +81,7 @@ public class SpiceDbContractTestContextProvider implements TestTemplateInvocatio
     var spicedb = createPostgeresSpicedbContainer(net);
 
     var db =
-        new PostgreSQLContainer<>(DockerImageName.parse("postgres").withTag("14"))
+        new PostgreSQLContainer<>(DockerImageName.parse("postgres").withTag("17"))
             .withDatabaseName("spicedb")
             .withPassword("root")
             .withUsername("postgres")
@@ -157,7 +157,7 @@ public class SpiceDbContractTestContextProvider implements TestTemplateInvocatio
 
   private GenericContainer<?> createSpicedbBaseContainer(String... args) {
 
-    return new GenericContainer<>(DockerImageName.parse("authzed/spicedb:v1.41.0"))
+    return new GenericContainer<>(DockerImageName.parse("authzed/spicedb:v1.44.3"))
         .withCommand(args)
         .withLogConsumer(f -> logger.info("spicedb {}: {}", args[0], f.getUtf8String()));
   }
