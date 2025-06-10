@@ -81,7 +81,7 @@
     <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
     <maven.versions.plugin.version>2.18.0</maven.versions.plugin.version>
 
-    <grpc.version>1.70.0</grpc.version>
+    <grpc.version>1.73.0</grpc.version>
 
     <!-- maven plugins cannot deal with slf4j 2.x -->
     <org.slf4j.version>1.7.36</org.slf4j.version>
