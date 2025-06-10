@@ -16,6 +16,10 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -148,6 +152,66 @@ class ExampleTest {
     assertEquals(2, checkPermissions.size());
     assertTrue(checkPermissions.get(0).permissionGranted());
     assertFalse(checkPermissions.get(1).permissionGranted());
+    Iterator<ObjectRef> usersAllowedToRead =
+        permissionService.lookupSubjects(document.lookupSubjectsReadUser());
+    assertTrue(usersAllowedToRead.hasNext());
+    // usersAllowedToRead contains both userId and user2
+    var userIds =
+        StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(usersAllowedToRead, Spliterator.ORDERED), false)
+            .map(ObjectRef::id)
+            .toList();
+    assertEquals(4, userIds.size());
+    assertTrue(userIds.contains(user.id()));
+    assertTrue(userIds.contains(userInTeam.id()));
+
+    // Example: find teams allowed to read the folder
+    Iterator<ObjectRef> teamsAllowedToRead =
+        permissionService.lookupSubjects(folder.lookupSubjectsReadTeamMember());
+    assertTrue(teamsAllowedToRead.hasNext());
+    assertEquals(team.id(), teamsAllowedToRead.next().id());
+  }
+
+
+  @Test
+  void updateRelationshipsShouldReturnValidConsistencyToken() {
+    var folder = FolderRef.of("test-folder");
+    var user = UserRef.ofLong(1);
+
+    var updateResult = permissionService.updateRelationships(
+        UpdateRelationships.newBuilder()
+            .update(folder.createReaderUser(user))
+            .build());
+
+    assertNotNull(updateResult.consistencyToken());
+  }
+
+  @Test
+  void checkPermissionShouldReturnFalseForUnknownUser() {
+    var document = DocumentRef.ofLong(99);
+    var unknownUser = UserRef.of("unknown");
+
+    var result = permissionService.checkPermission(
+        document.checkRead(SubjectRef.ofObject(unknownUser),Consistency.fullyConsistent()));
+
+    assertFalse(result);
+  }
+
+  @Test
+  void checkBulkPermissionsShouldReturnEmptyListForNoItems() {
+    var result = permissionService.checkBulkPermissions(
+        CheckBulkPermissions.newBuilder().build());
+
+    assertNotNull(result);
+    assertEquals(0, result.size());
+  }
+
+  @Test
+  void lookupSubjectsShouldReturnEmptyIteratorForNoMatches() {
+    var document = DocumentRef.ofLong(1000);
+
+    Iterator<ObjectRef> subjects = permissionService.lookupSubjects(document.lookupSubjectsReadUser());
+    assertFalse(subjects.hasNext());
   }
 
   private String loadSchema() {

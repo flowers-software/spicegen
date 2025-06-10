@@ -5,6 +5,7 @@ import static com.flowers.spicegen.generator.utils.TextUtils.toPascalCase;
 import com.flowers.spicegen.api.CheckBulkPermissionItem;
 import com.flowers.spicegen.api.CheckPermission;
 import com.flowers.spicegen.api.Consistency;
+import com.flowers.spicegen.api.LookupSubjects;
 import com.flowers.spicegen.api.ObjectRef;
 import com.flowers.spicegen.api.SubjectRef;
 import com.flowers.spicegen.api.UpdateRelationship;
@@ -32,7 +33,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -177,6 +180,7 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
 
       addCheckMethods(typedRefBuilder, definition);
       addBulkCheckMethods(typedRefBuilder, definition);
+      addLookupMethods(typedRefBuilder, definition);
 
       typedRef = typedRefBuilder.build();
       writeSource(typedRef, REFS_PACKAGE);
@@ -356,6 +360,48 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
                     relation.name(),
                     "ref",
                     allowedObject.relationship())
+                .build());
+      }
+    }
+  }
+
+  private void addLookupMethods(TypeSpec.Builder typeRefBuilder, ObjectDefinition definition) {
+    for (Permission permission : definition.permissions()) {
+
+      var allowedObjectTypes =
+          definition.relations().stream()
+              .flatMap(relation -> relation.allowedObjects().stream())
+              .collect(Collectors.groupingBy(ObjectTypeRef::typeName, Collectors.toList()))
+              .values()
+              .stream()
+              .map(List::getFirst)
+              .toList();
+
+      var permissionName = TextUtils.toPascalCase(permission.name());
+
+      for (var allowedObjectType : allowedObjectTypes) {
+
+        // TODO magic ref
+        String refType = toPascalCase(allowedObjectType.typeName());
+        var typeRefName = refType + "Ref";
+
+        ClassName className = ClassName.bestGuess(typeRefName);
+        var relationshipName = Objects.requireNonNullElse(allowedObjectType.relationship(), "");
+        var lookupSubjectsMethodName =
+            "lookupSubjects%s%s%s"
+                .formatted(permissionName, refType, toPascalCase(relationshipName));
+
+        typeRefBuilder.addMethod(
+            MethodSpec.methodBuilder(lookupSubjectsMethodName)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(LookupSubjects.class))
+                .addCode(
+                    """
+                  return LookupSubjects.newBuilder().resource(this).permission($S).subjectFactory($T::of).subjectRelation($S).build();
+                """,
+                    permission.name(),
+                    className,
+                    allowedObjectType.relationship())
                 .build());
       }
     }
