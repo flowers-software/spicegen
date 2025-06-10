@@ -17,7 +17,7 @@ public interface LookupSubjects {
   Function<String, ObjectRef> subjectFactory();
 
   default String subjectType() {
-    return subjectFactory().apply(null).kind();
+    return subjectFactory().apply("").kind();
   }
 
   interface Builder {

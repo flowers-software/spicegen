@@ -172,6 +172,48 @@ class ExampleTest {
     assertEquals(team.id(), teamsAllowedToRead.next().id());
   }
 
+
+  @Test
+  void updateRelationshipsShouldReturnValidConsistencyToken() {
+    var folder = FolderRef.of("test-folder");
+    var user = UserRef.ofLong(1);
+
+    var updateResult = permissionService.updateRelationships(
+        UpdateRelationships.newBuilder()
+            .update(folder.createReaderUser(user))
+            .build());
+
+    assertNotNull(updateResult.consistencyToken());
+  }
+
+  @Test
+  void checkPermissionShouldReturnFalseForUnknownUser() {
+    var document = DocumentRef.ofLong(99);
+    var unknownUser = UserRef.of("unknown");
+
+    var result = permissionService.checkPermission(
+        document.checkRead(SubjectRef.ofObject(unknownUser),Consistency.fullyConsistent()));
+
+    assertFalse(result);
+  }
+
+  @Test
+  void checkBulkPermissionsShouldReturnEmptyListForNoItems() {
+    var result = permissionService.checkBulkPermissions(
+        CheckBulkPermissions.newBuilder().build());
+
+    assertNotNull(result);
+    assertEquals(0, result.size());
+  }
+
+  @Test
+  void lookupSubjectsShouldReturnEmptyIteratorForNoMatches() {
+    var document = DocumentRef.ofLong(1000);
+
+    Iterator<ObjectRef> subjects = permissionService.lookupSubjects(document.lookupSubjectsReadUser());
+    assertFalse(subjects.hasNext());
+  }
+
   private String loadSchema() {
     try (var is = this.getClass().getResourceAsStream("/files.zed")) {
       return new String(is.readAllBytes(), StandardCharsets.UTF_8);
