@@ -136,18 +136,58 @@ class ExampleTest {
             document.checkRead(
                 SubjectRef.ofObject(userInTeam), Consistency.atLeastAsFreshAs(consistencyToken))));
 
+    // EXAMPLE: has Relationship
+    assertTrue(
+        permissionService.checkPermission(
+            team.hasMember(
+                SubjectRef.ofObject(userInTeam), Consistency.atLeastAsFreshAs(consistencyToken))));
+
     // EXAMPLE: checking multiple permissions
     var checkPermissions =
         permissionService.checkBulkPermissions(
             CheckBulkPermissions.newBuilder()
                 .item(document.checkBulkRead(SubjectRef.ofObject(user)))
                 .item(folder.checkBulkRead(SubjectRef.ofObject(UserRef.of("non-existing"))))
+                .item(document.hasBulkParentFolder(SubjectRef.ofObject(folder)))
                 .consistency(Consistency.atLeastAsFreshAs(consistencyToken))
                 .build());
 
-    assertEquals(2, checkPermissions.size());
+    assertEquals(3, checkPermissions.size());
     assertTrue(checkPermissions.get(0).permissionGranted());
     assertFalse(checkPermissions.get(1).permissionGranted());
+    assertTrue(checkPermissions.get(2).permissionGranted());
+  }
+
+  @Test
+  void updateRelationshipsShouldReturnValidConsistencyToken() {
+    var folder = FolderRef.of("test-folder");
+    var user = UserRef.ofLong(1);
+
+    var updateResult =
+        permissionService.updateRelationships(
+            UpdateRelationships.newBuilder().update(folder.createReaderUser(user)).build());
+
+    assertNotNull(updateResult.consistencyToken());
+  }
+
+  @Test
+  void checkPermissionShouldReturnFalseForUnknownUser() {
+    var document = DocumentRef.ofLong(99);
+    var unknownUser = UserRef.of("unknown");
+
+    var result =
+        permissionService.checkPermission(
+            document.checkRead(SubjectRef.ofObject(unknownUser), Consistency.fullyConsistent()));
+
+    assertFalse(result);
+  }
+
+  @Test
+  void checkBulkPermissionsShouldReturnEmptyListForNoItems() {
+    var result = permissionService.checkBulkPermissions(CheckBulkPermissions.newBuilder().build());
+
+    assertNotNull(result);
+    assertEquals(0, result.size());
   }
 
   private String loadSchema() {
