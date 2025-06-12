@@ -40,6 +40,7 @@ import javax.lang.model.element.Modifier;
 
 public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
 
+  private static final String SUBJECT_PARAM_NAME = "subject";
   private static final String REFS_PACKAGE = ".refs";
   private final TypeName objectRefTypeName = ClassName.get(ObjectRef.class);
   private final TypeName updateRelationshipTypeName = ClassName.get(UpdateRelationship.class);
@@ -177,9 +178,37 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
 
       addCheckMethods(typedRefBuilder, definition);
       addBulkCheckMethods(typedRefBuilder, definition);
+      addHasRelationMethods(typedRefBuilder, definition);
+      addHasBulkRelationMethods(typedRefBuilder, definition);
 
       typedRef = typedRefBuilder.build();
       writeSource(typedRef, REFS_PACKAGE);
+    }
+  }
+
+  private void addHasBulkRelationMethods(
+      TypeSpec.Builder typeRefBuilder, ObjectDefinition definition) {
+    for (Relation relation : definition.relations()) {
+
+      var relationName = TextUtils.toPascalCase(relation.name());
+      var checkMethod = "hasBulk" + relationName;
+
+      typeRefBuilder.addMethod(
+          MethodSpec.methodBuilder(checkMethod)
+              .addModifiers(Modifier.PUBLIC)
+              .addParameter(ClassName.get(SubjectRef.class), SUBJECT_PARAM_NAME)
+              .returns(ClassName.get(CheckBulkPermissionItem.class))
+              .addCode(
+                  """
+                if ($L == null) {
+                 throw new IllegalArgumentException("subject must not be null");
+                }
+                return CheckBulkPermissionItem.newBuilder().resource(this).permission($S).subject($L).build();
+              """,
+                  SUBJECT_PARAM_NAME,
+                  relation.name(),
+                  SUBJECT_PARAM_NAME)
+              .build());
     }
   }
 
@@ -236,6 +265,36 @@ public class SpiceDbClientGeneratorImpl implements SpiceDbClientGenerator {
                   subjectParamName,
                   permission.name(),
                   subjectParamName)
+              .build());
+    }
+  }
+
+  private void addHasRelationMethods(TypeSpec.Builder typeRefBuilder, ObjectDefinition definition) {
+    for (Relation relation : definition.relations()) {
+
+      var relationName = TextUtils.toPascalCase(relation.name());
+      var checkMethod = "has" + relationName;
+
+      var subjectParamName = "subject";
+      var consistencyParamName = "consistency";
+
+      typeRefBuilder.addMethod(
+          MethodSpec.methodBuilder(checkMethod)
+              .addModifiers(Modifier.PUBLIC)
+              .addParameter(ClassName.get(SubjectRef.class), subjectParamName)
+              .addParameter(ClassName.get(Consistency.class), consistencyParamName)
+              .returns(ClassName.get(CheckPermission.class))
+              .addCode(
+                  """
+                if ($L == null) {
+                 throw new IllegalArgumentException("subject must not be null");
+                }
+                return CheckPermission.newBuilder().resource(this).permission($S).subject($L).consistency($L).build();
+              """,
+                  subjectParamName,
+                  relation.name(),
+                  subjectParamName,
+                  consistencyParamName)
               .build());
     }
   }
