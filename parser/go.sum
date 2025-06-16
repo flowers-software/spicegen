@@ -4,6 +4,8 @@ github.com/authzed/spicedb v1.44.2 h1:haVbl+9TKAPfbALOLbG2yXC1SBK/gO8r0RTMb6pUHl
 github.com/authzed/spicedb v1.44.2/go.mod h1:mJJSFf6hVsJdKVU5HQg8ebVaaNetUAa+zFpY7RD3yeU=
 github.com/authzed/spicedb v1.44.3 h1:bBlgQ3Hmush1Zwbw6XUP9hhNWBYF2wdEyuocfMIXkQE=
 github.com/authzed/spicedb v1.44.3/go.mod h1:Qk9xpN8HWh+ayGatVfU42vQF238zJd2M1IsJxRND0PU=
+github.com/authzed/spicedb v1.44.4 h1:JOybYUoWAQw7tiJRcYqdXVTC9UdR2jJRj21lF+s8Zus=
+github.com/authzed/spicedb v1.44.4/go.mod h1:2e7+PVM4CIxAxj9an5HPblhozD4qrNwNdSjIj4qclmM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc=
