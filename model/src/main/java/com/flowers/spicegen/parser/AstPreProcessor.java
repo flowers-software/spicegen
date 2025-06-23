@@ -91,7 +91,7 @@ public class AstPreProcessor {
     return switch (raw) {
       case "aarch64" -> "arm64";
       case "i386" -> "386";
-      case "amd64" -> "amd64_v1";
+      case "amd64" -> "amd64";
       default ->
           throw new UnsupportedOperationException("architecture '%s' not supported".formatted(raw));
     };
