@@ -92,7 +92,7 @@
     <jupiter.version>5.13.1</jupiter.version>
     <mockito.jupiter.version>${mockito.version}</mockito.jupiter.version>
     <mockito.version>5.18.0</mockito.version>
-    <testcontainers.version>1.21.2</testcontainers.version>
+    <testcontainers.version>1.21.3</testcontainers.version>
 
     <spotless.maven.plugin.version>2.44.5</spotless.maven.plugin.version>
     <jacoco.version>0.8.13</jacoco.version>
