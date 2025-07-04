@@ -89,7 +89,7 @@
     <jackson.version>2.19.1</jackson.version>
     <protobuf-java.version>4.31.1</protobuf-java.version>
     <error_prone_annotations.version>2.30.0</error_prone_annotations.version>
-    <jupiter.version>5.13.1</jupiter.version>
+    <jupiter.version>5.13.3</jupiter.version>
     <mockito.jupiter.version>${mockito.version}</mockito.jupiter.version>
     <mockito.version>5.18.0</mockito.version>
     <testcontainers.version>1.21.2</testcontainers.version>
