@@ -94,7 +94,7 @@
     <mockito.version>5.18.0</mockito.version>
     <testcontainers.version>1.21.2</testcontainers.version>
 
-    <spotless.maven.plugin.version>2.44.5</spotless.maven.plugin.version>
+    <spotless.maven.plugin.version>2.46.1</spotless.maven.plugin.version>
     <jacoco.version>0.8.13</jacoco.version>
 
   </properties>
