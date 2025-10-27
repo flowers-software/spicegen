@@ -4,7 +4,7 @@ go 1.24.0
 
 toolchain go1.24.4
 
-require github.com/authzed/spicedb v1.44.4
+require github.com/authzed/spicedb v1.47.0
 
 require (
 	github.com/emirpasic/gods v1.18.1 // indirect
