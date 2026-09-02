@@ -6,6 +6,8 @@ github.com/authzed/spicedb v1.44.3 h1:bBlgQ3Hmush1Zwbw6XUP9hhNWBYF2wdEyuocfMIXkQ
 github.com/authzed/spicedb v1.44.3/go.mod h1:Qk9xpN8HWh+ayGatVfU42vQF238zJd2M1IsJxRND0PU=
 github.com/authzed/spicedb v1.44.4 h1:JOybYUoWAQw7tiJRcYqdXVTC9UdR2jJRj21lF+s8Zus=
 github.com/authzed/spicedb v1.44.4/go.mod h1:2e7+PVM4CIxAxj9an5HPblhozD4qrNwNdSjIj4qclmM=
+github.com/authzed/spicedb v1.54.0 h1:XQiFm/G/YpQktYmcLCVrQRWkkLpAjUBZa1SBoEbmd0A=
+github.com/authzed/spicedb v1.54.0/go.mod h1:9McK3CNkb831IzWZ1pVsswVoqjZTyDPy3fUF7GcvvOY=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc=
@@ -16,5 +18,6 @@ github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOf
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 golang.org/x/exp v0.0.0-20250531010427-b6e5de432a8b h1:QoALfVG9rhQ/M7vYDScfPdWjGL9dlsVVM5VGh7aKoAA=
 golang.org/x/exp v0.0.0-20250531010427-b6e5de432a8b/go.mod h1:U6Lno4MTRCDY+Ba7aCcauB9T60gsv5s4ralQzP72ZoQ=
+golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f/go.mod h1:J1xhfL/vlindoeF/aINzNzt2Bket5bjo9sdOYzOsU80=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
